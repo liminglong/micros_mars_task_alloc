@@ -6,6 +6,7 @@ A cooperative robot team is a multi-agent robot system in essence. In the team, 
 <center>
 ![image1](doc/images/alliance_generic_model.jpg)
 </center>
+
 ALLIANCE model is a natural extension of Brooks' famous subsumption model, which is applicable to fault-tolerant cooperative multi-robot systems. As shown in the figure above, each single robots in the cooperative team should obey a same ALLIANCE model. The model is composed of several behavior sets and behavior layers. Both of them are implemented by following the subsumption model. The behavior sets correspond to some high-level task-achieving functions. The module named 'motivational behavior' can activate the behavior sets to select a task adaptively. The 'F' circles in the figure above connect the output of each motivational behavior with the output of its corresponding behavior set indicating that a motivational behavior either allows all or none of the outputs of its behavior set to pass through to the robot's actuators. The lower several layers of the ALLIANCE architecture composed a subsumption model, we can also use the subsumption method to coordinate the behavior inside the behavior sets. Note that the motivational behavior needs to receive the sensor information. Besides, the output of some behavior set can also be used as the sensor information, which is called `virtual sensors' in ALLIANCE model(imaginary lines in the figure above). 
 
 ##General Overview
@@ -33,32 +34,37 @@ The main APIs are shown below. The parameter names present the parameter functio
 
 ```python
 Inhibitor(inhibitor_name, topic_in, in_out_msg_type, topic_out, inhibiting_topic, inhibiting_msg_type)
-suppressor(suppressor_name, topic_in, in_out_msg\_type, topic_out, suppressing_topic, suppressing_msg_type)
+suppressor(suppressor_name, topic_in, in_out_msg_type, topic_out, suppressing_topic, suppressing_msg_type)
 Forwarder(forwarder_name, topic_1_in , msg_1_type, topic_1_out, topic_2_in, msg_2_type, topic_2_out)
 MotivationalBehavior(motivational_behavior_name, robot_ID, behavior_set_ID, forwarder_name)
 ```
 
 ##A Demo
 We assume a scenario that there are three rooms in a house and each robot patrols a room according to several pre-selected goals. If another intruder robot moves into the house, one of the three patrol robots can detect it, follow it and alarm. But at the same time, the room the robot patrols before is empty. So the other two patrol robots will compensate for this fault and patrol different rooms alternately. Besides, during the whole system running, one of the robot may break down, the other two robots may also compensate the fault according to the way mentioned above. We have used the package to develop the system. 
+
 * The ALLIANCE model and UML graph of the application is shown in the figures below
+
 <center>
 ![image4](doc/images/apm.jpg)
 </center>
+
 <center>
 ![image5](doc/images/apuml.jpg)
 </center>
 
 
 * The exprimental result is shown in the figures below.
+
 <center>
 ![image6](doc/images/sim_follow.jpg)
 </center>
+
 <center>
 ![image7](doc/images/real_follow.jpg)
 </center>
 
 * If you want to test the demo yourself, please follow the steps below.
-** environmental configuration
+1. environmental configuration
 Notice that, the multi-robot task need multi-robot collision avoidance. One ROS package can help you do this, so you should git clone and compile the collvoid package first.
 ```
 git clone https://github.com/daenny/collvoid.git
@@ -67,7 +73,7 @@ The package needs a simulated environment supporting multi-robot navigation with
 ```
 git clone https://github.com/liminglong/multi_robot_stage.git
 ```
-** run the demo
+2. run the demo
 Run the following commands in your terminal.
 ```
 cd /catkin_ws/src/micros_mars_task_alloc/scripts/basic_support
@@ -86,5 +92,5 @@ python robot2.py
 ```
 Then the whole system will run as a whole.
 
-## Videos
+##Videos
 The experimental videos can be downloaded and watched [here.](https://www.trustie.net/organizations/61)
