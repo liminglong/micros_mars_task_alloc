@@ -1,0 +1,90 @@
+#!/usr/bin/env python
+
+__author__ = "Minglong Li"
+
+import sys
+sys.path.append("..")
+from middle_abstraction.function_unit import FunctionUnit
+import actionlib
+import multi_robot_patrol.msg
+import rospy
+
+class RobotPatrol(FunctionUnit):
+    def __init__(self, node_name, pose_0, pose_1, pose_2, pose_3, topic, wait_time):
+        FunctionUnit.__init__(self, node_name)
+        #self._node_name = node_name
+        self._pose_0 = pose_0
+        self._pose_1 = pose_1
+        self._pose_2 = pose_2
+        self._pose_3 = pose_3
+        self._topic = topic
+        self._wait_time = wait_time
+        
+    def run(self):
+        pass
+
+    def start_patrol(self):
+        FunctionUnit.init_node(self) 
+        self._client = actionlib.SimpleActionClient(self._topic, multi_robot_patrol.msg.MoveBaseAction)#use 'super' to call the method of his father class.
+        #FunctionUnit.init() #use class name to call the father method
+        #print 'Patroller 0 starts!'
+        
+        #client.wait_for_server()
+        #Several goals to be sent to the action server.
+        goal_0 = multi_robot_patrol.msg.MoveBaseGoal()
+        goal_0.target_pose.header.frame_id = 'map'
+        goal_0.target_pose.pose.position.x = self._pose_0[0]
+        goal_0.target_pose.pose.position.y = self._pose_0[1]
+        goal_0.target_pose.pose.position.z = 0.0
+        goal_0.target_pose.pose.orientation.x = 0.0
+        goal_0.target_pose.pose.orientation.y = 0.0
+        goal_0.target_pose.pose.orientation.z = self._pose_0[2]
+        goal_0.target_pose.pose.orientation.w = self._pose_0[3]	
+
+        goal_1 = multi_robot_patrol.msg.MoveBaseGoal()
+        goal_1.target_pose.header.frame_id = 'map'
+        goal_1.target_pose.pose.position.x = self._pose_1[0]
+        goal_1.target_pose.pose.position.y = self._pose_1[1]
+        goal_1.target_pose.pose.position.z = 0.0
+        goal_1.target_pose.pose.orientation.x = 0.0
+        goal_1.target_pose.pose.orientation.y = 0.0
+        goal_1.target_pose.pose.orientation.z = self._pose_1[2]
+        goal_1.target_pose.pose.orientation.w = self._pose_1[3]
+
+        goal_2 = multi_robot_patrol.msg.MoveBaseGoal()
+        goal_2.target_pose.header.frame_id = 'map'
+        goal_2.target_pose.pose.position.x = self._pose_2[0]
+        goal_2.target_pose.pose.position.y = self._pose_2[1]
+        goal_2.target_pose.pose.position.z =  0.0
+        goal_2.target_pose.pose.orientation.x = 0.0
+        goal_2.target_pose.pose.orientation.y = 0.0
+        goal_2.target_pose.pose.orientation.z = self._pose_2[2]
+        goal_2.target_pose.pose.orientation.w = self._pose_2[3] 	
+
+        goal_3 = multi_robot_patrol.msg.MoveBaseGoal()
+        goal_3.target_pose.header.frame_id = 'map'
+        goal_3.target_pose.pose.position.x = self._pose_3[0]
+        goal_3.target_pose.pose.position.y = self._pose_3[1]
+        goal_3.target_pose.pose.position.z = 0.0
+        goal_3.target_pose.pose.orientation.x = 0.0
+        goal_3.target_pose.pose.orientation.y = 0.0
+        goal_3.target_pose.pose.orientation.z = self._pose_3[2]
+        goal_3.target_pose.pose.orientation.w = self._pose_3[3]
+
+        while not rospy.is_shutdown():
+            self._client.send_goal(goal_0)
+            self._client.wait_for_result(rospy.Duration.from_sec(self._wait_time))
+
+            self._client.send_goal(goal_1)
+            self._client.wait_for_result(rospy.Duration.from_sec(self._wait_time))
+            
+            self._client.send_goal(goal_2)
+            self._client.wait_for_result(rospy.Duration.from_sec(self._wait_time))
+            
+            self._client.send_goal(goal_3)
+            #self._client.cancel_all_goals()
+            self._client.wait_for_result(rospy.Duration.from_sec(self._wait_time))
+
+    def cancel_goal(self):
+         self._client.cancel_all_goals()
+        

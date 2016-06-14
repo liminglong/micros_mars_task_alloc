@@ -1,0 +1,171 @@
+<launch>
+    <!-- Turtlesim Node-->
+    <!--node pkg="turtlesim" type="turtlesim_node" name="sim"/-->
+    <!--node pkg="turtlesim" type="turtle_teleop_key" name="teleop" output="screen">
+    </node-->
+
+  <!-- Name of the map to use (without path nor extension) and initial position -->
+  <arg name="map_file"       default=" $(find multi_robot_stage)/maps/three_rooms.yaml"/> <!-- robopark_plan -->
+  <arg name="world_file"     default=" $(find multi_robot_stage)/maps/stage/three_rooms.world"/>
+
+  <param name="/use_sim_time" value="true"/>
+  
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
+    <param name="frame_id" value="/map"/>
+  </node>
+  
+  <node pkg="stage_ros" type="stageros" name="stageros" args="$(arg world_file)">
+    
+  </node>
+  
+  <include file="$(find multi_robot_stage)/launch/robot_model.launch"/>
+  <!--include file="$(find multi_robot_stage)/launch/navigation.launch"/-->
+  <!--  **************** navigation.launch ****************  -->
+  <param name="/use_sim_time" value="true"/>
+  
+  <rosparam command="load" file="$(find multi_robot_stage)/params/robot_goals.yaml"/>
+  <node pkg="collvoid_controller" type="controller.py" name="controller" output="screen"/>
+
+  <!-- ROBOT 1 -->
+  <group ns="robot_0">
+    <param name="tf_prefix" value="robot_0" />
+    <param name="amcl/initial_pose_x" value="3" />
+    <param name="amcl/initial_pose_y" value="3" />
+    <!--include file="$(find multi_robot_stage)/launch/move_base.launch" >     
+      <arg name="robot_name" value="robot_0" />
+    </include-->
+<!--************************************************move_base************************************************************-->
+    <arg name="robot_name" value="robot_0"/>
+    <!--arg name="init_pose"/-->
+   
+    <arg name="base"      value="$(optenv TURTLEBOT_BASE kobuki)"/> <!-- create, roomba -->
+    <arg name="battery"   value="$(optenv TURTLEBOT_BATTERY /proc/acpi/battery/BAT0)"/>  <!-- /proc/acpi/battery/BAT0 --> 
+    <arg name="stacks"    value="$(optenv TURTLEBOT_STACKS hexagons)"/>  <!-- circles, hexagons --> 
+    <arg name="3d_sensor" value="$(optenv TURTLEBOT_3D_SENSOR kinect)"/>  <!-- kinect, asus_xtion_pro --> 
+
+    <param name="/use_sim_time" value="true"/>
+  
+    <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find turtlebot_description)/robots/$(arg base)_$(arg stacks)_$(arg 3d_sensor).urdf.xacro'" />
+    <param name="robot_description" command="$(arg urdf_file)" />
+
+    <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/> 
+<!--************************************************topic change is here!!!!!************************************************************-->
+    <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
+	  args="load yocs_cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
+      <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml" />
+      <remap from="cmd_vel_mux/output" to="cmd_vel_liminglong"/>
+    </node>
+<!--************************************************topic change is here!!!!!************************************************************-->
+
+    
+    
+    <include file="$(find multi_robot_stage)/launch/includes/amcl_multirobot.launch.xml">
+      <arg name="use_map_topic"             value="true"/>
+      <arg name="global_frame_id" value="/map"/>
+      <arg name="odom_frame_id"   value="$(arg robot_name)/odom"/>
+      <arg name="base_frame_id"   value="$(arg robot_name)/base_footprint"/>
+      <arg name="scan_topic"   value="base_scan"/>
+    
+    </include>
+    
+    <!--
+    <node name="fake_localization" pkg="fake_localization"  type="fake_localization" respawn="false">
+      <param name="global_frame_id" value="/map"/>
+      <param name="odom_frame_id"   value="$(arg robot_name)/odom"/>
+      <param name="base_frame_id"   value="$(arg robot_name)/base_footprint"/>
+    </node> 
+    -->
+
+
+  <arg name="odom_frame_id"   default="odom"/>
+  <arg name="base_frame_id"   default="base_link"/>
+  <arg name="global_frame_id" default="/map"/>
+  <arg name="odom_topic" default="odom" />
+  <arg name="cmd_vel_topic" default="cmd_vel" />
+  <arg name="scan_topic" default="base_scan" />
+  <node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen">
+
+    
+    <rosparam command="load" file="$(find multi_robot_stage)/params/params_turtle.yaml" />
+    <rosparam command="load" file="$(find multi_robot_stage)/params/collvoid_config.yaml" />
+    
+    
+    <!-- reset frame_id parameters using user input data -->
+    <param name="global_costmap/global_frame" value="$(arg global_frame_id)"/>
+    <param name="global_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
+    <param name="local_costmap/global_frame" value="$(arg odom_frame_id)"/>
+    <param name="local_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
+
+   
+    <param name="base_local_planner" value="collvoid_local_planner/CollvoidLocalPlanner" />
+    <!-- <param name="base_global_planner" value="collvoid_simple_global_planner/CollvoidSimpleGlobalPlanner" /> -->
+    <remap from="/position_share_in" to="/position_share" />
+    <remap from="/position_share_out" to="/position_share" />
+    <remap from="cmd_vel" to="liminglong" />
+    <remap from="scan" to="$(arg scan_topic)"/>
+    <remap from="map" to="/map" />
+
+
+  </node>
+  <!--************************************************************************-->
+
+    <node name="robot_pose_publisher" pkg="robot_pose_publisher" type="robot_pose_publisher" output="screen">      
+      <param name="base_frame"             value="$(arg robot_name)/base_link"/> 
+    </node> 
+    
+    
+<!--************************************************move_base************************************************************-->
+    <node pkg="collvoid_controller" type="controllerRobots.py" name="controllerRobots" output="screen" />
+    
+
+  </group>
+
+  <group ns="robot_1">
+    <param name="tf_prefix" value="robot_1" />
+    <param name="amcl/initial_pose_x" value="3" />
+    <param name="amcl/initial_pose_y" value="1" />
+    <include file="$(find multi_robot_stage)/launch/move_base.launch" >     
+      <arg name="robot_name" value="robot_1" />
+    </include>
+    <node pkg="collvoid_controller" type="controllerRobots.py" name="controllerRobots" output="screen" />
+  </group>
+  
+  
+  <group ns="robot_2">
+    <param name="tf_prefix" value="robot_2" />
+    <param name="amcl/initial_pose_x" value="1" />
+    <param name="amcl/initial_pose_y" value="3" />
+    <include file="$(find multi_robot_stage)/launch/move_base.launch" >     
+      <arg name="robot_name" value="robot_2" />      
+    </include>    
+    <node pkg="collvoid_controller" type="controllerRobots.py" name="controllerRobots" output="screen" />
+  </group>
+  
+  <group ns="robot_3">
+    <param name="tf_prefix" value="robot_3" />
+    <param name="amcl/initial_pose_x" value="1" />
+    <param name="amcl/initial_pose_y" value="1" />
+    <include file="$(find multi_robot_stage)/launch/move_base.launch" >     
+      <arg name="robot_name" value="robot_3" />
+    </include>
+    <node pkg="collvoid_controller" type="controllerRobots.py" name="controllerRobots" output="screen" />
+  </group> 
+  <!--  **************** Visualisation ****************  -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find multi_robot_stage)/rviz/multi_robot_navigation.rviz"/>
+
+  <group ns = 'robot_0'>
+    <node pkg="multi_robot_patrol" type="robot_patrol_area0.py" name="robot0_patrol_area0">
+    </node>
+  </group>
+
+  <group ns = 'robot_1'>
+    <node pkg="multi_robot_patrol" type="robot_patrol_area1.py" name="robot1_patrol_area1">
+    </node>
+  </group>
+
+  <group ns = 'robot_2'>
+    <node pkg="multi_robot_patrol" type="robot_patrol_area2.py" name="robot2_patrol_area2">
+    </node>
+  </group>
+
+</launch>

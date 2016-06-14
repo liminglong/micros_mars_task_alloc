@@ -1,0 +1,19 @@
+<launch>
+  <include file="$(find multi_robot_stage)/launch/multi_robot.launch"/>
+
+  <group ns = 'robot_0'>
+    <node pkg="multi_robot_patrol" type="robot_patrol_area0.py" name="robot0_patrol_area0">
+    </node>
+  </group>
+
+  <group ns = 'robot_1'>
+    <node pkg="multi_robot_patrol" type="robot_patrol_area1.py" name="robot1_patrol_area1">
+    </node>
+  </group>
+
+  <group ns = 'robot_2'>
+    <node pkg="multi_robot_patrol" type="robot_patrol_area2.py" name="robot2_patrol_area2">
+    </node>
+  </group>
+
+</launch>

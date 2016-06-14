@@ -1,0 +1,5 @@
+<launch>
+    <node name="robot_leader1" pkg="multi_robot_patrol" type="robot_leader.py" respawn="false" output="screen" >
+      <param name="turtle" type="string" value="turtle1" />
+    </node>
+</launch>
