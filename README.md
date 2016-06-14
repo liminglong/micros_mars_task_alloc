@@ -63,8 +63,10 @@ We assume a scenario that there are three rooms in a house and each robot patrol
 ![image7](doc/images/real_follow.jpg)
 </center>
 
-* If you want to test the demo yourself, please follow the steps below.
+If you want to test the demo yourself, please follow the steps below.
+
 1. environmental configuration
+
 Notice that, the multi-robot task need multi-robot collision avoidance. One ROS package can help you do this, so you should git clone and compile the collvoid package first.
 ```
 git clone https://github.com/daenny/collvoid.git
@@ -74,6 +76,7 @@ The package needs a simulated environment supporting multi-robot navigation with
 git clone https://github.com/liminglong/multi_robot_stage.git
 ```
 2. run the demo
+
 Run the following commands in your terminal.
 ```
 cd /catkin_ws/src/micros_mars_task_alloc/scripts/basic_support
