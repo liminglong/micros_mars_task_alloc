@@ -65,7 +65,7 @@ We assume a scenario that there are three rooms in a house and each robot patrol
 
 If you want to test the demo yourself, please follow the steps below.
 
-1. environmental configuration
+** environmental configuration
 
 Notice that, the multi-robot task need multi-robot collision avoidance. One ROS package can help you do this, so you should git clone and compile the collvoid package first.
 ```
@@ -75,7 +75,7 @@ The package needs a simulated environment supporting multi-robot navigation with
 ```
 git clone https://github.com/liminglong/multi_robot_stage.git
 ```
-2. run the demo
+** run the demo
 
 Run the following commands in your terminal.
 ```
