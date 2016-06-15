@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 from middle_abstraction.function_unit import FunctionUnit
 import actionlib
-import multi_robot_patrol.msg
+import micros_mars_task_alloc.msg
 import rospy
 
 class RobotPatrol(FunctionUnit):
@@ -25,13 +25,13 @@ class RobotPatrol(FunctionUnit):
 
     def start_patrol(self):
         FunctionUnit.init_node(self) 
-        self._client = actionlib.SimpleActionClient(self._topic, multi_robot_patrol.msg.MoveBaseAction)#use 'super' to call the method of his father class.
+        self._client = actionlib.SimpleActionClient(self._topic, micros_mars_task_alloc.msg.MoveBaseAction)#use 'super' to call the method of his father class.
         #FunctionUnit.init() #use class name to call the father method
         #print 'Patroller 0 starts!'
         
         #client.wait_for_server()
         #Several goals to be sent to the action server.
-        goal_0 = multi_robot_patrol.msg.MoveBaseGoal()
+        goal_0 = micros_mars_task_alloc.msg.MoveBaseGoal()
         goal_0.target_pose.header.frame_id = 'map'
         goal_0.target_pose.pose.position.x = self._pose_0[0]
         goal_0.target_pose.pose.position.y = self._pose_0[1]
@@ -41,7 +41,7 @@ class RobotPatrol(FunctionUnit):
         goal_0.target_pose.pose.orientation.z = self._pose_0[2]
         goal_0.target_pose.pose.orientation.w = self._pose_0[3]	
 
-        goal_1 = multi_robot_patrol.msg.MoveBaseGoal()
+        goal_1 = micros_mars_task_alloc.msg.MoveBaseGoal()
         goal_1.target_pose.header.frame_id = 'map'
         goal_1.target_pose.pose.position.x = self._pose_1[0]
         goal_1.target_pose.pose.position.y = self._pose_1[1]
@@ -51,7 +51,7 @@ class RobotPatrol(FunctionUnit):
         goal_1.target_pose.pose.orientation.z = self._pose_1[2]
         goal_1.target_pose.pose.orientation.w = self._pose_1[3]
 
-        goal_2 = multi_robot_patrol.msg.MoveBaseGoal()
+        goal_2 = micros_mars_task_alloc.msg.MoveBaseGoal()
         goal_2.target_pose.header.frame_id = 'map'
         goal_2.target_pose.pose.position.x = self._pose_2[0]
         goal_2.target_pose.pose.position.y = self._pose_2[1]
@@ -61,7 +61,7 @@ class RobotPatrol(FunctionUnit):
         goal_2.target_pose.pose.orientation.z = self._pose_2[2]
         goal_2.target_pose.pose.orientation.w = self._pose_2[3] 	
 
-        goal_3 = multi_robot_patrol.msg.MoveBaseGoal()
+        goal_3 = micros_mars_task_alloc.msg.MoveBaseGoal()
         goal_3.target_pose.header.frame_id = 'map'
         goal_3.target_pose.pose.position.x = self._pose_3[0]
         goal_3.target_pose.pose.position.y = self._pose_3[1]

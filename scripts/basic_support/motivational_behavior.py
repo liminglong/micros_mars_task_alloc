@@ -6,7 +6,7 @@ __author__ = "Minglong Li"
 import sys
 sys.path.append("..")
 from middle_abstraction.function_unit import FunctionUnit
-from multi_robot_patrol.msg import Heartbeat
+from micros_mars_task_alloc.msg import Heartbeat
 from std_msgs.msg import Bool
 import time
 import thread
