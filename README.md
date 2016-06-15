@@ -71,12 +71,21 @@ Notice that, the multi-robot task need multi-robot collision avoidance. One ROS 
 ```
 git clone https://github.com/daenny/collvoid.git
 ```
-The package needs a simulated environment supporting multi-robot navigation without confliction (the prefixes of the namespace and TF may conflict with each other). You should git clone the multi_robot_stage package in your own catkin_ws, and recompile your workspace.
+The package needs a simulated environment supporting multi-robot navigation without confliction (the prefixes of the namespace and TF may conflict with each other). You should git clone the multi_robot_stage package in your own catkin_ws.
 ```
 git clone https://github.com/liminglong/multi_robot_stage.git
 ```
-* run the demo
+And then git clone this package micros_mars_task_alloc in your workspace.
+```
+git clone https://github.com/liminglong/micros_mars_task_alloc.git
+```
+Finally, even all the codes are witten in python, you should compile the files in your workspace again. Such that the added message files can be imported by the python modules. Don't forget to source your setup.bash.
 
+* run the demo
+First, launch the simulated multi-robot environment.
+```
+roslaunch multi_robot_stage multi_robot.launch
+```
 Run the following commands in your terminal.
 ```
 cd /catkin_ws/src/micros_mars_task_alloc/scripts/basic_support
@@ -93,7 +102,12 @@ Open another new ternimal in the same directory to run the third robot.
 ```
 python robot2.py
 ```
-Then the whole system will run as a whole.
+Then the whole system will run as a whole. The three robots patrol the three rooms.
+Besides, you can also control a suspicious robot to invade the room.
+```
+roslaunch micros_mars_task_alloc robot3_control.launch
+```
+One of the robot can detect and follow it immediately. The remained room will not be empty, because the other two robots will patrol the three rooms alternatively and compensate for this fault.
 
 ##Videos
 The experimental videos can be downloaded and watched [here.](https://www.trustie.net/organizations/61)
