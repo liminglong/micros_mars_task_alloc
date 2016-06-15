@@ -2,8 +2,8 @@
 Changelog for package micros_mars_task_alloc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.4 (2016-06-15)
+------------------
 * Update README.md
 * commit on June 15th
 * commit on June 15th
