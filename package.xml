@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>micros_mars_task_alloc</name>
-  <version>0.0.4</version>
+  <version>0.0.5</version>
   <description>The micros_mars_task_alloc package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
