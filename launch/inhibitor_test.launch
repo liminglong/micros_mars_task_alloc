@@ -1,0 +1,13 @@
+<launch>
+  <node pkg="nodelet" type="nodelet" name="auto_wander_robot_manager" args="manager" output="screen" />
+  
+    <node pkg="nodelet" type="nodelet" name="whenlook_wander_inhibitor" args="load micros_mars_task_alloc/WhenlookWanderInhibitor auto_wander_robot_manager">
+    <rosparam>
+      upper_topic: /whenlook/startlook
+      lower_topic: /wander/inhibitor/heading
+      output_topic: /inhibitor/suppressor/heading
+      time_duration: 7.5
+    </rosparam>
+    </node>
+
+</launch>

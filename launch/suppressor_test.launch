@@ -1,0 +1,18 @@
+<launch>
+
+  <node pkg="nodelet" type="nodelet" name="suppressor_1" args="load micros_mars_task_alloc/SuppressorTest subsumption_model_manager" output="screen">
+    <!--
+    <param name = 'upper_topic' value = 'upper_topic'/>
+    <param name = 'lower_topic' value = 'lower_topic'/>
+    <param name = 'output_topic' value = 'output_topic'/>
+    <param name = 'time_duration' value = '1.0'/>
+    -->
+    <rosparam>
+      upper_topic: upper_topic
+      lower_topic: lower_topic
+      output_topic: output_topic
+      time_duration: 1.0
+    </rosparam>
+  </node>
+
+</launch>

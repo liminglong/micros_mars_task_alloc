@@ -1,0 +1,9 @@
+<launch>
+
+  <node pkg="nodelet" type="nodelet" name="pub" args="load micros_mars_task_alloc/NodeletPub pub_sub_manager" output="screen">
+    <remap from="chatter" to="hello"/>
+  </node>
+                 
+
+</launch>
+

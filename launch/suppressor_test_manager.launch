@@ -1,0 +1,14 @@
+<launch>
+  <node pkg="nodelet" type="nodelet" name="subsumption_model_manager" args="manager" output="screen" />
+  <!-- MUX the data onto one topic -->
+  <!--
+  <node pkg="nodelet" type="nodelet" name="suppressor_1" args="load micros_mars_task_alloc/NodeletTest subsumption_model_manager" output="screen">
+    <rosparam>
+      upper_topic: upper_topic
+      lower_topic: lower_topic
+      output_topic: output_topic
+      time_duration: 1.0
+    </rosparam>
+  </node>
+  -->
+</launch>

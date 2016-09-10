@@ -1,0 +1,81 @@
+<library path="lib/libmicros_mars_task_alloc">
+<!--three-layer auto_wander_robot-->
+    <!--layer 0:-->
+        <class name="micros_mars_task_alloc/Feelforce" type="micros_mars_task_alloc::Feelforce" base_class_type="nodelet::Nodelet">
+            <description>The feelforce module of the auto wander robot.</description>
+        </class>
+    
+        <class name="micros_mars_task_alloc/Runaway" type="micros_mars_task_alloc::Runaway" base_class_type="nodelet::Nodelet">
+            <description>The runaway module of the auto wander robot.</description>
+        </class>
+        
+        <class name="micros_mars_task_alloc/Collide" type="micros_mars_task_alloc::Collide" base_class_type="nodelet::Nodelet">
+            <description>The collide module of the auto wander robot.</description>
+        </class>
+    
+        <class name="micros_mars_task_alloc/Turn" type="micros_mars_task_alloc::Turn" base_class_type="nodelet::Nodelet">
+            <description>The turn module of the auto wander robot.</description>
+        </class>    
+
+        <class name="micros_mars_task_alloc/Forward" type="micros_mars_task_alloc::Forward" base_class_type="nodelet::Nodelet">
+            <description>The forward module of the auto wander robot.</description>
+        </class> 
+                
+    <!--layer 1:-->
+        <class name="micros_mars_task_alloc/Wander" type="micros_mars_task_alloc::Wander" base_class_type="nodelet::Nodelet">
+            <description>The forward module of the auto wander robot.</description>
+        </class> 
+        
+        <class name="micros_mars_task_alloc/Avoid" type="micros_mars_task_alloc::Avoid" base_class_type="nodelet::Nodelet">
+            <description>The avoid module of the auto wander robot.</description>
+        </class> 
+        
+        <class name="micros_mars_task_alloc/AvoidRunawaySuppressor" type="micros_mars_task_alloc::AvoidRunawaySuppressor" base_class_type="nodelet::Nodelet">
+            <description>The avoid_runaway_suppressor module of the auto wander robot.</description>
+        </class>
+    <!--layer 2:-->
+        <class name="micros_mars_task_alloc/Status" type="micros_mars_task_alloc::Status" base_class_type="nodelet::Nodelet">
+            <description>The status module of the auto wander robot.</description>
+        </class>
+        
+        <class name="micros_mars_task_alloc/Whenlook" type="micros_mars_task_alloc::Whenlook" base_class_type="nodelet::Nodelet">
+            <description>The whenlook module of the auto wander robot.</description>
+        </class>
+        
+        <class name="micros_mars_task_alloc/Pathplan" type="micros_mars_task_alloc::Pathplan" base_class_type="nodelet::Nodelet">
+            <description>The pathplan module of the auto wander robot.</description>
+        </class>
+        
+        <class name="micros_mars_task_alloc/Look" type="micros_mars_task_alloc::Look" base_class_type="nodelet::Nodelet">
+            <description>The look module of the auto wander robot.</description>
+        </class>
+        
+        <class name="micros_mars_task_alloc/WhenlookWanderInhibitor" type="micros_mars_task_alloc::WhenlookWanderInhibitor" base_class_type="nodelet::Nodelet">
+            <description>The whenlook_wander_inhibitor module of the auto wander robot.</description>
+        </class>
+        
+        <class name="micros_mars_task_alloc/PathplanWanderSuppressor" type="micros_mars_task_alloc::PathplanWanderSuppressor" base_class_type="nodelet::Nodelet">
+            <description>The pathplan_wander_suppressor module of the auto wander robot.</description>
+        </class>
+        
+<!--The multiple security patrol robots.-->     
+        <class name="micros_mars_task_alloc/RobotDetect" type="micros_mars_task_alloc::RobotDetect" base_class_type="nodelet::Nodelet">
+            <description>The robot detect module of the multiple patrol robot application.</description>
+        </class>
+         
+        <class name="micros_mars_task_alloc/RobotFollow" type="micros_mars_task_alloc::RobotFollow" base_class_type="nodelet::Nodelet">
+            <description>The robot follow module of the multiple patrol robot application.</description>
+        </class> 
+        
+        <class name="micros_mars_task_alloc/RobotPatrol" type="micros_mars_task_alloc::RobotPatrol" base_class_type="nodelet::Nodelet">
+            <description>The robot patrol module of the multiple patrol robot application.</description>
+        </class> 
+        
+        <class name="micros_mars_task_alloc/ForwarderTest" type="micros_mars_task_alloc::ForwarderTest" base_class_type="nodelet::Nodelet">
+            <description>The forwarder_test module of the nodelet multi_robot_patrol.</description>
+        </class> 
+        
+        <class name="micros_mars_task_alloc/MotivationalBehaviorTest" type="micros_mars_task_alloc::MotivationalBehaviorTest" base_class_type="nodelet::Nodelet">
+            <description>The motivational_behavior_test module of the nodelet multi_robot_patrol.</description>
+        </class> 
+</library>

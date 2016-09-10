@@ -4,6 +4,9 @@ project(micros_mars_task_alloc)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
+add_definitions(-std=c++11)
+
 find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
@@ -17,8 +20,13 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   cv_bridge
   nav_msgs
+  nodelet
+  message_filters
 )
 
+
+
+find_package(Boost REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -58,6 +66,9 @@ find_package(catkin REQUIRED COMPONENTS
    msg
    FILES
    Heartbeat.msg
+   Force.msg
+   Heading.msg
+   Path.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -78,9 +89,15 @@ add_action_files(
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
    DEPENDENCIES
-   actionlib_msgs   geometry_msgs   std_msgs sensor_msgs 
+   actionlib_msgs   geometry_msgs  std_msgs sensor_msgs 
  )
-
+ 
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES micros_mars_task_alloc
+  CATKIN_DEPENDS actionlib actionlib_msgs geometry_msgs message_generation roscpp rospy std_msgs kobuki_msgs sensor_msgs cv_bridge nav_msgs message_filters
+  DEPENDS system_lib Boost
+)
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
@@ -110,11 +127,7 @@ generate_messages(
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-  LIBRARIES micros_mars_task_alloc
-  CATKIN_DEPENDS actionlib actionlib_msgs geometry_msgs message_generation roscpp rospy std_msgs kobuki_msgs sensor_msgs cv_bridge nav_msgs
-  DEPENDS system_lib
-)
+
 
 ###########
 ## Build ##
@@ -123,15 +136,42 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
+include_directories(include
+  SYSTEM ${BOOST_INCLUDE_DIRS}
+         ${catkin_INCLUDE_DIRS}
+
 )
 
 ## Declare a C++ library
-# add_library(micros_mars_task_alloc
-#   src/${PROJECT_NAME}/micros_mars_task_alloc.cpp
-# )
-
+add_library(${PROJECT_NAME}
+#APP1: The three-layer autonomous wander robot based on subsumption model.
+    #layer 0 of the autonomous wander robot
+    src/nodelets/auto_wander_robot/layer0/feelforce.cpp
+    src/nodelets/auto_wander_robot/layer0/runaway.cpp
+    src/nodelets/auto_wander_robot/layer0/collide.cpp
+    src/nodelets/auto_wander_robot/layer0/turn.cpp
+    src/nodelets/auto_wander_robot/layer0/forward.cpp
+    #layer 1 of the autonomous wander robot
+    src/nodelets/auto_wander_robot/layer1/wander.cpp
+    src/nodelets/auto_wander_robot/layer1/avoid.cpp
+    src/nodelets/auto_wander_robot/layer1/avoid_runaway_suppressor.cpp   
+    #layer 2 of the autonomous wander robot
+    src/nodelets/auto_wander_robot/layer2/status.cpp
+    src/nodelets/auto_wander_robot/layer2/whenlook.cpp
+    src/nodelets/auto_wander_robot/layer2/pathplan.cpp
+    src/nodelets/auto_wander_robot/layer2/look.cpp
+    src/nodelets/auto_wander_robot/layer2/whenlook_wander_inhibitor.cpp
+    src/nodelets/auto_wander_robot/layer2/pathplan_wander_suppressor.cpp
+   
+#APP2: The multiple security patrol robots based on ALLIANCE model.
+    src/nodelets/multi_patrol_robot/robot_detect.cpp   
+    src/nodelets/multi_patrol_robot/robot_follow.cpp      
+    src/nodelets/multi_patrol_robot/robot_patrol.cpp
+    
+    src/nodelets/multi_patrol_robot/test/forwarder_test.cpp
+    src/nodelets/multi_patrol_robot/motivational_behavior_test.cpp
+ )
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -139,7 +179,8 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(micros_mars_task_alloc_node src/micros_mars_task_alloc_node.cpp)
-
+#add_executable(shared_ptr_test src/nodes/shared_ptr_test.cpp)
+add_executable(mf_test src/nodes/mf_test.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(micros_mars_task_alloc_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -148,7 +189,12 @@ include_directories(
 # target_link_libraries(micros_mars_task_alloc_node
 #   ${catkin_LIBRARIES}
 # )
-
+#target_link_libraries(shared_ptr_test
+#   ${catkin_LIBRARIES}
+# )
+ target_link_libraries(mf_test
+   ${catkin_LIBRARIES}
+ )
 #############
 ## Install ##
 #############

@@ -1,0 +1,5 @@
+<launch>
+
+<include file="$(find multi_robot_stage)/launch/multi_robot.launch"/>
+
+</launch>

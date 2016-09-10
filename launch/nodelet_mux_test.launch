@@ -1,0 +1,9 @@
+<launch> 
+ <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+  <!-- MUX the data onto one topic -->
+  <node pkg="nodelet" type="nodelet" name="data_mux" args="load pcl/NodeletMUX pcl_manager" output="screen">
+    <rosparam>
+      input_topics: [/passthrough/output, /normal_estimation/output]
+    </rosparam>
+  </node>
+</launch>

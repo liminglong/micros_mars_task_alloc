@@ -7,7 +7,7 @@
     </rosparam>
   </node>
   
-  <node pkg="nodelet" type="nodelet" name="robot_detect_0" args="load micros_mars_task_alloc/RobotDetect multi_robot_patrol_manager">
+  <node pkg="nodelet" type="nodelet" name="robot_follow" args="load micros_mars_task_alloc/RobotFollow multi_robot_patrol_manager">
   </node>
 
 </launch>

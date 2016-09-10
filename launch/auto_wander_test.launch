@@ -1,0 +1,94 @@
+<launch>    
+    <!--The stdr simulator.-->
+    <include file="$(find stdr_robot)/launch/robot_manager.launch" />        
+    <node type="stdr_server_node" pkg="stdr_server" name="stdr_server" output="screen" args="$(find micros_mars_task_alloc)/maps/subsumption_test_map.yaml"/>
+    <node pkg="tf" type="static_transform_publisher" name="world2map" args="0 0 0 0 0 0  world map 100" />    
+    <include file="$(find stdr_gui)/launch/stdr_gui.launch"/>      
+    <node pkg="stdr_robot" type="robot_handler" name="$(anon robot_spawn)" args="add $(find micros_mars_task_alloc)/robots/simulated_robot.yaml 4 2 0" />    
+    
+    <!--This project has only one nodelet manager. There are 32 worker threads totallly to run the robot.-->
+    <node pkg="nodelet" type="nodelet" name="auto_wander_robot_manager" args="manager" output="screen" >
+    <rosparam>
+        num_worker_threads: 32
+    </rosparam>
+    </node>
+    
+    <!--layer 0: avoid contacts with objects (whether the objects move or are stationary).-->
+    <node pkg="nodelet" type="nodelet" name="feelforce" args="load micros_mars_task_alloc/Feelforce auto_wander_robot_manager">
+    </node>
+    
+    <node pkg="nodelet" type="nodelet" name="runaway" args="load micros_mars_task_alloc/Runaway auto_wander_robot_manager">
+        
+    		<remap from="/runaway/turn/heading" to="/runaway/suppressor/heading"/>
+    </node>
+    
+    <node pkg="nodelet" type="nodelet" name="turn" args="load micros_mars_task_alloc/Turn auto_wander_robot_manager">
+    </node>
+    
+    <node pkg="nodelet" type="nodelet" name="forward" args="load micros_mars_task_alloc/Forward auto_wander_robot_manager">
+    </node>
+    
+
+    <node pkg="nodelet" type="nodelet" name="collide" args="load micros_mars_task_alloc/Collide auto_wander_robot_manager">
+    </node>
+    
+    <!--layer 1: wander aimlessly without hitting obstacles.-->
+
+    <node pkg="nodelet" type="nodelet" name="wander" args="load micros_mars_task_alloc/Wander auto_wander_robot_manager">
+        <!--The function of "layer 2" is based on this remap-->
+        <remap from="/wander/heading" to="/wander/inhibitor/heading"/>
+    </node>
+    
+    <node pkg="nodelet" type="nodelet" name="avoid" args="load micros_mars_task_alloc/Avoid auto_wander_robot_manager">
+       <!--The function of "layer 2" is based on this remap-->
+       <remap from="/wander/heading" to="/suppressor/avoid/heading"/>
+    </node>
+    
+    <node pkg="nodelet" type="nodelet" name="avoid_runaway_suppressor" args="load micros_mars_task_alloc/AvoidRunawaySuppressor auto_wander_robot_manager">
+    <rosparam>
+      upper_topic: /avoid/suppressor/heading
+      lower_topic: /runaway/suppressor/heading
+      output_topic: /runaway/turn/heading
+      time_duration: 2.0
+    </rosparam>
+    </node>
+
+    <!--layer 2: "explore" the world by seeing places in the distance which look reachable and heading for them.-->
+    <node pkg="nodelet" type="nodelet" name="whenlook" args="load micros_mars_task_alloc/Whenlook auto_wander_robot_manager">
+    </node>
+    
+    <node pkg="nodelet" type="nodelet" name="whenlook_wander_inhibitor" args="load micros_mars_task_alloc/WhenlookWanderInhibitor auto_wander_robot_manager">
+
+    <rosparam>
+      upper_topic: /whenlook/startlook
+      lower_topic: /wander/inhibitor/heading
+      output_topic: /inhibitor/suppressor/heading
+      time_duration: 7.5
+
+    </rosparam>
+  
+    </node>
+    
+    
+    <node pkg="nodelet" type="nodelet" name="status" args="load micros_mars_task_alloc/Status auto_wander_robot_manager">
+    </node>
+
+
+    <node pkg="nodelet" type="nodelet" name="pathplan" args="load micros_mars_task_alloc/Pathplan auto_wander_robot_manager">
+    </node>    
+    
+    <node pkg="nodelet" type="nodelet" name="look" args="load micros_mars_task_alloc/Look auto_wander_robot_manager">
+    </node>
+    
+    <node pkg="nodelet" type="nodelet" name="pathplan_wander_suppressor" args="load micros_mars_task_alloc/PathplanWanderSuppressor auto_wander_robot_manager">
+
+    <rosparam>
+      upper_topic: /pathplan/suppressor
+      lower_topic: /inhibitor/suppressor/heading
+      output_topic: /suppressor/avoid/heading
+      time_duration: 5.0
+    </rosparam>
+    </node>
+
+    <!--TODO: the same lower_topic and the output_topic may have problem.-->    
+</launch>
