@@ -25,8 +25,8 @@ namespace micros_mars_task_alloc{
     class MotivationalBehavior : public nodelet::Nodelet
     {
     public:
-        MotivationalBehavior(): motivation_(0), sensory_feedback_(1), sensory_feedback_exist_(false), maximum_time_step_(100000), 
-                                                  delta_fast_(10), delta_slow_(0.01), threshold_(1000), impatience_reset_(1), impatience_reset_flag_(true), activity_suppression_(1){}
+        MotivationalBehavior(): motivation_(0), sensory_feedback_(1), sensory_feedback_exist_(false), maximum_time_step_(100000), active_time_duration_(0),  one_cycle_(0.1),
+                                             delta_fast_(10), delta_slow_(0.01), threshold_(1000), impatience_reset_(1), activity_suppression_(1){}
         virtual ~MotivationalBehavior(){}
         virtual void onInit()
         {
@@ -56,6 +56,11 @@ namespace micros_mars_task_alloc{
                 std::cout << "Fail to get the parameter inter_robot_comm_topic." << std::endl;
                 return;
             }
+            if(!(nh_.getParam("forward_topic", forward_topic_)))
+            {
+                std::cout << "Fail to get the parameter forward_topic." << std::endl;
+                return;
+            }
             //initialise the vector heartbeat_, the row number is robot_number_ and the column number is maximum_time_step_.
             //heartbeat_ is a 2-dimision vector.
             heartbeat_.resize(robot_number_);
@@ -72,21 +77,25 @@ namespace micros_mars_task_alloc{
                 }
             }
             //initialise the heartbeat_count,  heartbeat_count _  is  a floating point-to-reference, which is used for the ring vector.
-            heartbeat_count_.resize(robot_number_)
+            heartbeat_count_.resize(robot_number_);
             for (int i = 0; i < heartbeat_count_.size(); i++)
             {
                 heartbeat_count_[i] = 0;
             }
+            /*
             //initialise the vector comm_received and comm_received_timestamp_, the default value of the elements in this vector is set to 0.
             for (int i = 0; i < robot_number_; i++)
             {
                 comm_received_.push_back(0);
                 comm_received_timestamp_.push_back(0);
-            }
-            main_periodic_timer_ = nh_.createTimer(ros::Duration(0.1), &MotivationalBehavior::main_logic_callback, this);//control the main logic.
+            }*/
+            pub_intra_heartbeat_ = nh_.advertise<std_msgs::Bool>(intra_robot_comm_topic_, 10);
+            pub_inter_heartbeat_ = nh_.advertise<std_msgs::Bool>(inter_robot_comm_topic_, 10);
+            pub_forward_ = nh_.advertise<std_msgs::Bool>(forward_topic_, 10);
             sub_0_ = nh_.subscribe(sensory_feedback_topic_, 10, &MotivationalBehavior::sensory_feedback_callback, this);//sub_0_ is used to handle the sensory_feedback_ messages.
             sub_1_ = nh_.subscribe(inter_robot_comm_topic_, 10, &MotivationalBehavior::inter_robot_comm_callback, this);//sub_1_ is used to handle the inter-robot communicating messages.
             sub_2_ = nh_.subscribe(intra_robot_comm_topic_, 10, &MotivationalBehavior::intra_robot_comm_callback, this);//sub_2_ is used to hangle the intra-robot communicating messages.
+            main_periodic_timer_ = nh_.createTimer(ros::Duration(one_cycle_), &MotivationalBehavior::main_logic_callback, this);//control the main logic.
         }
 
         void sensory_feedback_callback(const boost::shared_ptr<const VS_MsgType> & msg)
@@ -100,7 +109,7 @@ namespace micros_mars_task_alloc{
         void inter_robot_comm_callback(const micros_mars_task_alloc::HeartbeatConstPtr & msg)
         {
             std::cout << "inter_robot_comm_callback start!" << std::endl;
-            if( (msg->robot_ID != this_robot_ID_)&&(msg->behavior_set_ID == this_behavior_set_ID) )
+            if( (msg->robot_ID != this_robot_ID_)&&(msg->behavior_set_ID == this_behavior_set_ID_) )
             {
                 heartbeat_[msg->robot_ID][ heartbeat_count_[msg->robot_ID] ] = msg->heartbeat;
                 heartbeat_count_[msg->robot_ID]+=1;
@@ -119,81 +128,137 @@ namespace micros_mars_task_alloc{
         }
         void impatience_reset_calc()//This function should be put into the main logic function.
         {
-            //impatience reset: when this robot hears about another robot performing this behavior set, and check only once.
-            if(impatience_reset_flag_)
+            //impatience reset: when this robot hears about another robot performing this behavior set.
+            bool flag = false;
+            bool flag1, flag2;
+            for (int i = 0; i < robot_number_; i ++)
             {
-                int p, q;//p and  q are responsible for handling the index number of the ring queue.
-                bool flag1 = true;
-                bool flag2 = false;
-                for (int i = 0; i < robot_number_; i ++)
+                if (i == this_robot_ID_) continue;
+                int current  = heartbeat_count_[i];
+                flag1 = true;
+                for (int j = 1; j < current; j++)
                 {
-                    if (i == this_robot_ID_) continue;
-                    p = (heartbeat_count_[i] - 1 + maximum_time_step_) % maximum_time_step_;
-                    q = (heartbeat_count_[i] - 2 + maximum_time_step_) % maximum_time_step_;// delta_t means 2 time steps.
-                    current  = heartbeat_count_[i];
-                    for (int j = 0; j < q; j++)
-                    {  
-                        if(heartbeat_[i][j] == true)
-                            flag1 = false;
-                    }
-                    if (heartbeat_count_[i][current] && heartbeat_[i][p] && heartbeat_[i][q])
-                        flag2= true;
-
-                    if (flag1 && flag2)
-                    {
-                        impatience_reset_ =  0;
-                        break;
-                    }
+                    if (heartbeat_[i][j] == true)
+                        flag1 = false;
                 }
-                if(!(flag1 && flag2) && (impatience_reset_ == 0))
+                flag2 = false;
+                if (heartbeat_[i][current] == true)
+                    flag2 = true;
+                if (flag1 && flag2)
                 {
-                    impatience_reset_ = 1;
-                    impatience_reset_flag_ =  false;
+                    flag = true;
+                    break;
                 }
-            }//TODO: the impatience_reset_  should be reset to 1.            
+            }
+            if (flag == true)
+                impatience_reset_ = 1;
+            else
+                impatience_reset_ = 0;
         }
         void impatience_calc()//This function should be put into the main logic function.
         {
             bool delta_fast_flag = true;
-            //gama is 3, phi is 5.  
             for (int i = 0; i < robot_number_; i++)//i is robot_ID
             {
-                //because heartbeat_ is a ring_queue, we need to handle the index number of this ring queue, m and n.
-                int m = (heartbeat_count_[i] - 3 + maximum_time_step_) % maximum_time_step_;
-                int n = (heartbeat_count_[i] - 5 + maximum_time_step_) % maximum_time_step_;
-                if( (heartbeat_[i][ heartbeat_count_[i] ] == true)&& (heartbeat_[i][ m ] == true) && (heartbeat_[i][ n ] == false) && (i != this_robot_ID_) )   
-                    delta_fast_flag = false;               
-                else
-                    delta_fast_flag = true;
+                if(i == this_robot_ID_) break;
+                int current = heartbeat_count_[i];
+                if(heartbeat_[i][current] == true)
+                {
+                    delta_fast_flag = false;
+                    break;
+                }
             }
             if(delta_fast_flag)
-            {
-                impatience_ = impatience_ + delta_fast_;   
-                if(impatience_ > threshold_)
-                    impatience_ = threshold_;
-            }
-            else         
-            {    
-                impatience_ = impatience_ + delta_slow_;
-                if(impatience_ > threshold_)
-                    impatience_ = threshold_;
-            }                           
+                impatience_ = delta_fast_;
+            else
+                impatience_ = delta_slow_;                        
         }
         void acquiescence_calc()
         {
             cout << "acquiescence_calc start" << endl;     
-            //TODO: to be implemented.
+            double phi = 200.0;
+            double lamda = 300.0; //behavior set aij of robot ri has been active for more than lamda time.
+            if (active_ == 0)
+                acquiescence_ = 1;// It means that this beahvior set in this robot is not active.
+            else
+            {
+                 //double current_time = ros::Time::now().toSec();//current_time is a time_stamp.
+                 if ( active_time_duration_ > lamda)
+                    acquiescence_ = 0;
+                else
+                {
+                    bool flag = false;
+                    bool flag1 = false;
+                    if (active_time_duration_ > phi)
+                        flag1 ==true;
+                    bool flag2 = false;
+                    for(int i = 0; i < robot_number_; i++)
+                    {
+                        if (i == this_robot_ID_) continue;
+                        int current = heartbeat_count_[i];
+                        if(heartbeat_[i][current] == true)
+                        {
+                            flag2 = true;
+                            break;
+                        }
+                    }
+                    flag = flag1 && flag2;
+                    if(flag) 
+                        acquiescence_ = 0;
+                    else
+                        acquiescence_ = 1;
+                }
+            }
+        }
+        void send_inter_heartbeat(bool heartbeat)
+        {
+            micros_mars_task_alloc::HeartbeatPtr heartbeat_ptr(new micros_mars_task_alloc::Heartbeat);
+            heartbeat_ptr -> robot_ID = this_robot_ID_;
+            heartbeat_ptr -> behavior_set_ID = this_behavior_set_ID_;
+            heartbeat_ptr -> heartbeat = heartbeat;
+            pub_inter_heartbeat_.publish(heartbeat_ptr);
+        }
+        void send_intra_heartbeat(bool heartbeat)
+        {
+            micros_mars_task_alloc::HeartbeatPtr heartbeat_ptr(new micros_mars_task_alloc::Heartbeat);
+            heartbeat_ptr -> robot_ID = this_robot_ID_;
+            heartbeat_ptr -> behavior_set_ID = this_behavior_set_ID_;
+            heartbeat_ptr -> heartbeat = heartbeat;
+            pub_intra_heartbeat_.publish(heartbeat_ptr);
         }
         void main_logic_callback(const ros::TimerEvent&)
         {
             double update_time;
             update_time = ros::Time::now().toSec();
-            if ((sensory_feedback_exist_) && (update_time - sensory_feedback_timestamp_ > 1.0))//The time duration for the sensory feedback is 1.0 sensond
+            std_msgs::BoolPtr bool_ptr(new std_msgs::Bool);
+            if ((sensory_feedback_exist_) && (update_time - sensory_feedback_timestamp_ > 1.0))//The time duration for the sensory feedback is 1.0 sensond, the '1.0' can control the real-time efficiency.
             {
                 sensory_feedback_ = 0;
             }
             impatience_calc();
-            //TODO
+            impatience_reset_calc();
+            acquiescence_calc();
+            motivation_ = (motivation_ + impatience_) * sensory_feedback_ * activity_suppression_ * impatience_reset_ * acquiescence_;
+            if(motivation_ > threshold_) 
+                motivation_ = threshold_;
+            if(motivation_ == threshold_)
+             {
+                active_ = true;
+                active_time_duration_ += one_cycle_;
+                bool_ptr -> data = true;
+                send_intra_heartbeat(true);
+                send_inter_heartbeat(true);
+                pub_forward_.publish(bool_ptr);
+             } 
+             else
+             {
+                active_ = false;
+                active_time_duration_ = 0;
+                bool_ptr -> data  = false;
+                send_inter_heartbeat(false);
+                send_inter_heartbeat(false);
+                pub_forward_.publish(bool_ptr);
+             }
         }
     private:    
         ros::NodeHandle nh_;
@@ -201,7 +266,9 @@ namespace micros_mars_task_alloc{
         ros::Subscriber sub_0_;
         ros::Subscriber sub_1_;
         ros::Subscriber sub_2_;
-        ros::Publisher pub_;
+        ros::Publisher pub_intra_heartbeat_;//publish heartbeat messages in this robot, which is used for the control of activity_suppression.
+        ros::Publisher pub_inter_heartbeat_;//publish heartbeat messages among team robots, which is used for the control of comm_received.
+        ros::Publisher pub_forward_;
         
         int this_robot_ID_;//the ID of this robot, to be set by the paramters in the launch file.
         int this_behavior_set_ID_;//the ID of this behavior set in this robot, to be set by the parameters in the launch file.
@@ -212,8 +279,10 @@ namespace micros_mars_task_alloc{
         std::string sensory_feedback_topic_;
         std::string inter_robot_comm_topic_;
         std::string intra_robot_comm_topic_;
+        std::string forward_topic_;
     
         //Some parameters used to calculate the motivation, TODO: these may be used as local parameters.
+        double motivation_;
         double impatience_;
         double acquiescence_;
         double sensory_feedback_;//TODO: the default value of sensory feedback is 1.
@@ -223,16 +292,20 @@ namespace micros_mars_task_alloc{
         double activity_suppression_;//if any other behavior set in this robot is activated, the motivation of this behavior set is set to 0. 
         double impatience_reset_;
         
+        bool active_;
+        double active_time_duration_;
+        double one_cycle_;
+        
         double delta_slow_;//when another robot is doing this work, the increasing velocity of impatience in this motivational behavior is delta_slow_
         double delta_fast_;//when none of the robots is doing this work, the increasing velocity of impatience in this motivational behavior is delta_fast_
         double threshold_;
         
-        bool impatience_reset_check_flag_;
-        
         vector<int> heartbeat_count_;
         vector< vector<bool> > heartbeat_;
-        vector<double> comm_received_;//The size of this vector is robot_number, we don't need to know
-        vector<double> comm_received_timestamp_;//the vector to log the timestamp.
+
+        //comm_received was omitted in this version.
+        //vector<double> comm_received_;//The size of this vector is robot_number, we don't need to know
+        //vector<double> comm_received_timestamp_;//the vector to log the timestamp.
     }; 
     typedef micros_mars_task_alloc::MotivationalBehavior<std_msgs::Bool> MotivationalBehaviorTest;//TODO: to test the module, the module will be made as a '.h' file in future work.
 }//namespace micros_mars_task_alloc
