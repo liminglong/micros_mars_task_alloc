@@ -71,8 +71,8 @@
             <description>The robot patrol module of the multiple patrol robot application.</description>
         </class> 
         
-        <class name="micros_mars_task_alloc/ForwarderTest" type="micros_mars_task_alloc::ForwarderTest" base_class_type="nodelet::Nodelet">
-            <description>The forwarder_test module of the nodelet multi_robot_patrol.</description>
+        <class name="micros_mars_task_alloc/ForwarderTest" type="micros_mars_task_alloc::ForwarderBool" base_class_type="nodelet::Nodelet">
+            <description>The forwarder_bool module of the nodelet multi_robot_patrol.</description>
         </class> 
         
         <class name="micros_mars_task_alloc/MotivationalBehaviorTest" type="micros_mars_task_alloc::MotivationalBehaviorTest" base_class_type="nodelet::Nodelet">

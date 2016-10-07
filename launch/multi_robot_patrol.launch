@@ -7,7 +7,114 @@
     </rosparam>
   </node>
   
-  <node pkg="nodelet" type="nodelet" name="robot_detect_0" args="load micros_mars_task_alloc/RobotDetect multi_robot_patrol_manager">
+  <!--These are modules of robot 0.-->
+  <!--Motivational Behaviors-->
+  
+  <!--Forwarders-->
+  <node pkg="nodelet" type="nodelet" name="robot_0_forwarder_0" args="load micros_mars_task_alloc/ForwarderTest multi_robot_patrol_manager">
+      <rosparam>
+      activating_topic: robot_0/forwarder_0/activating_topic
+      input_topic_0: robot_0/forwarder_0/input_topic_0
+      output_topic_0: robot_0/forwarder_0/output_topic_0
+      </rosparam>
   </node>
+  
+  <node pkg="nodelet" type="nodelet" name="robot_0_forwarder_0" args="load micros_mars_task_alloc/ForwarderTest multi_robot_patrol_manager">
+      <rosparam>
+      activating_topic: robot_0/forwarder_1/activating_topic
+      input_topic_0: robot_0/forwarder_1/input_topic_0
+      output_topic_0: robot_0/forwarder_1/output_topic_0
+      </rosparam>
+  </node>
+  
+  <node pkg="nodelet" type="nodelet" name="robot_0_forwarder_0" args="load micros_mars_task_alloc/ForwarderTest multi_robot_patrol_manager">
+      <rosparam>
+      activating_topic: robot_0/forwarder_2/activating_topic
+      input_topic_0: robot_0/forwarder_2/input_topic_0
+      output_topic_0: robot_0/forwarder_2/output_topic_0
+      </rosparam>
+  </node>
+  
+  <node pkg="nodelet" type="nodelet" name="robot_0_forwarder_0" args="load micros_mars_task_alloc/ForwarderBool multi_robot_patrol_manager">
+      <rosparam>
+      activating_topic: robot_0/forwarder_3/activating_topic
+      input_topic_0: robot_0/forwarder_3/input_topic_0
+      output_topic_0: robot_0/forwarder_3/output_topic_0
+      </rosparam>
+  </node>  
+  
+  <!--Behavior sets-->
+  <node pkg="nodelet" type="nodelet" name="robot_0_patrol_area_0" args="load micros_mars_task_alloc/RobotPatrol multi_robot_patrol_manager">
+      <rosparam>
+      goal_topic: robot_0/forwarder_0
+      goal_0_pos_x: 0.95
+      goal_0_pos_y: 6.0
+      goal_0_ori_z: 0.0
+      goal_0_ori_w: 1.0
+      goal_1_pos_x: 2.57
+      goal_1_pos_y: 6.05
+      goal_1_ori_z: 0.706
+      goal_1_ori_w: 0.709     
+      goal_2_pos_x: 2.46
+      goal_2_pos_y: 8.81
+      goal_2_ori_z: 1.0
+      goal_2_ori_w: 0.0
+      goal_3_pos_x: 0.95
+      goal_3_pos_y: 8.88
+      goal_3_ori_z: -0.707
+      goal_3_ori_w: 0.707     
+      </rosparam>
+  </node>
+  
+  <node pkg="nodelet" type="nodelet" name="robot_0_patrol_area_1" args="load micros_mars_task_alloc/RobotPatrol multi_robot_patrol_manager">
+      <rosparam>
+      goal_topic: robot_0/forwarder_1
+      goal_0_pos_x: 4.0
+      goal_0_pos_y: 6.0
+      goal_0_ori_z: 0.0
+      goal_0_ori_w: 1.0
+      goal_1_pos_x: 5.9
+      goal_1_pos_y: 6.05
+      goal_1_ori_z: 0.706
+      goal_1_ori_w: 0.709     
+      goal_2_pos_x: 5.9
+      goal_2_pos_y: 8.81
+      goal_2_ori_z: 1.0
+      goal_2_ori_w: 0.0
+      goal_3_pos_x: 4.0
+      goal_3_pos_y: 8.88
+      goal_3_ori_z: -0.707
+      goal_3_ori_w: 0.707     
+      </rosparam>
+  </node>  
+
+  <node pkg="nodelet" type="nodelet" name="robot_0_patrol_area_2" args="load micros_mars_task_alloc/RobotPatrol multi_robot_patrol_manager">
+      <rosparam>
+      goal_topic: robot_0/forwarder_2
+      goal_0_pos_x: 7.36
+      goal_0_pos_y: 6.0
+      goal_0_ori_z: 0.0
+      goal_0_ori_w: 1.0
+      goal_1_pos_x: 9.20
+      goal_1_pos_y: 6.05
+      goal_1_ori_z: 0.706
+      goal_1_ori_w: 0.709     
+      goal_2_pos_x: 9.20
+      goal_2_pos_y: 8.81
+      goal_2_ori_z: 1.0
+      goal_2_ori_w: 0.0
+      goal_3_pos_x: 7.36
+      goal_3_pos_y: 8.88
+      goal_3_ori_z: -0.707
+      goal_3_ori_w: 0.707     
+      </rosparam>
+  </node>  
+  
+  <node pkg="nodelet" type="nodelet" name="robot_0_detect" args="load micros_mars_task_alloc/RobotDetect multi_robot_patrol_manager">
+      <rosparam>
+      output_topic: robot_0/forwarder_3
+      </rosparam>
+  </node>
+
 
 </launch>

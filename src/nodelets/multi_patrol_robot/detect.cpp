@@ -11,6 +11,7 @@
 
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
+#include <std_msgs/Bool.h>
 #include <vector>
 #include <cv_bridge/cv_bridge.h>
 
@@ -36,15 +37,20 @@ namespace micros_mars_task_alloc{
         ros::NodeHandle nh_;
         ros::Subscriber sub_; 
         ros::Publisher pub_;
+        std::string output_topic_;
+        //std::bool detected_flag;
     };
-
     void RobotDetect::onInit()
     {
         nh_ = getMTPrivateNodeHandle();
-        sub_ = nh_.subscribe("/robot_0/image", 10, &RobotDetect::callback, this);
-        //pub_ = nh_.advertise<micros_mars_task_alloc::Path>("path", 10);//This is a relative topic, the prefix look will be added automaically.
+        if (!(nh_.getParam("output_topic", output_topic_)))
+        {
+            std::cout << "Fail to get the parameter output_topic." << std::endl;
+            return;
+        } 
+        pub_ = nh_.advertise<std_msgs::Bool>(output_topic_, 10);                  
+        sub_ = nh_.subscribe("/robot_0/image", 10, &RobotDetect::callback, this);//the topic here does not change
     }
-
     void RobotDetect::callback(const sensor_msgs::ImageConstPtr & msg)
     {
         cv_bridge::CvImagePtr cv_ptr;
@@ -59,12 +65,20 @@ namespace micros_mars_task_alloc{
         }
         cv::Mat_<cv::Vec3b>::iterator it = cv_ptr->image.begin<cv::Vec3b>();
         cv::Mat_<cv::Vec3b>::iterator itend = cv_ptr->image.end<cv::Vec3b>();
+        bool flag = false;
         for(;it != itend; ++it)
         {
             if((*it)[0]==0 && (*it)[1]==0 && (*it)[2]==255)
-                cout << "red color was detected" << endl;
+            {
+                 flag = true;
+            }
+        }
+        if(flag)
+        {
+            std_msgs::BoolPtr bool_ptr(new std_msgs::Bool);
+            bool_ptr -> data = true;
+            pub_.publish(bool_ptr);
         }
     }
-
 }//namespace micros_mars_task_alloc
 PLUGINLIB_EXPORT_CLASS(micros_mars_task_alloc::RobotDetect, nodelet::Nodelet)

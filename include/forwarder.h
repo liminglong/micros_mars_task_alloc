@@ -26,7 +26,7 @@ namespace micros_mars_task_alloc {
 
 using namespace std;
 
-template<typename MsgType_0, typename MsgType_1>
+template<typename MsgType_0, typename MsgType_1 = std_msgs::Bool>
 class Forwarder : public nodelet::Nodelet
 {
 

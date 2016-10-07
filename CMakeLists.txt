@@ -164,11 +164,11 @@ add_library(${PROJECT_NAME}
     src/nodelets/auto_wander_robot/layer2/pathplan_wander_suppressor.cpp
    
 #APP2: The multiple security patrol robots based on ALLIANCE model.
-    src/nodelets/multi_patrol_robot/robot_detect.cpp   
-    src/nodelets/multi_patrol_robot/robot_follow.cpp      
-    src/nodelets/multi_patrol_robot/robot_patrol.cpp
+    src/nodelets/multi_patrol_robot/detect.cpp   
+    src/nodelets/multi_patrol_robot/follow.cpp      
+    src/nodelets/multi_patrol_robot/patrol.cpp
     
-    src/nodelets/multi_patrol_robot/test/forwarder_test.cpp
+    src/nodelets/multi_patrol_robot/forwarder_bool.cpp
     src/nodelets/multi_patrol_robot/motivational_behavior_test.cpp
  )
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

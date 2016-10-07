@@ -11,7 +11,7 @@ Created on: Sep. 5th, 2016
 
 namespace micros_mars_task_alloc {
 
-typedef micros_mars_task_alloc::Forwarder<std_msgs::Bool, std_msgs::Bool> ForwarderTest;
+typedef micros_mars_task_alloc::Forwarder<std_msgs::Bool> ForwarderTest;
 
 }//namespace micros_mars_task_alloc
 PLUGINLIB_EXPORT_CLASS(micros_mars_task_alloc::ForwarderTest, nodelet::Nodelet)
