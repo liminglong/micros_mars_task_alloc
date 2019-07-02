@@ -4,8 +4,7 @@ A cooperative robot team is a multi-agent robot system in essence. In the team, 
 ## ALLIANCE model
 
 <center>
-![Image text]
-(https://github.com/liminglong/micros_mars_task_alloc/tree/master/doc/images/alliance_generic_model.jpg)
+![Image text](doc/images/alliance_generic_model.jpg)
 </center>
 
 ALLIANCE model is a natural extension of Brooks' famous subsumption model, which is applicable to fault-tolerant cooperative multi-robot systems. As shown in the figure above, each single robots in the cooperative team should obey a same ALLIANCE model. The model is composed of several behavior sets and behavior layers. Both of them are implemented by following the subsumption model. The behavior sets correspond to some high-level task-achieving functions. The module named 'motivational behavior' can activate the behavior sets to select a task adaptively. The 'F' circles in the figure above connect the output of each motivational behavior with the output of its corresponding behavior set indicating that a motivational behavior either allows all or none of the outputs of its behavior set to pass through to the robot's actuators. The lower several layers of the ALLIANCE architecture composed a subsumption model, we can also use the subsumption method to coordinate the behavior inside the behavior sets. Note that the motivational behavior needs to receive the sensor information. Besides, the output of some behavior set can also be used as the sensor information, which is called `virtual sensors' in ALLIANCE model(imaginary lines in the figure above). 
