@@ -4,7 +4,7 @@ A cooperative robot team is a multi-agent robot system in essence. In the team, 
 ## ALLIANCE model
 
 <center>
-![image1]
+![Image text]
 (https://github.com/liminglong/micros_mars_task_alloc/tree/master/doc/images/alliance_generic_model.jpg)
 </center>
 
