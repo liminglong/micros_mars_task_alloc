@@ -1,7 +1,7 @@
 # micros_mars_task_alloc
 A cooperative robot team is a multi-agent robot system in essence. In the team, each robot can be seen as an intelligent agent. This is a ROS package used for the mult-task allocation in a robot team. It is based on Multi-Agent theory and is an abstraction of ALLIANCE model. We have developed a prototype system by python hitherto. The nodelet-based C++ version is being developed and will be released in short time periods. 
 
-##ALLIANCE model
+## ALLIANCE model
 
 <center>
 ![image1](doc/images/alliance_generic_model.jpg)
@@ -9,7 +9,7 @@ A cooperative robot team is a multi-agent robot system in essence. In the team, 
 
 ALLIANCE model is a natural extension of Brooks' famous subsumption model, which is applicable to fault-tolerant cooperative multi-robot systems. As shown in the figure above, each single robots in the cooperative team should obey a same ALLIANCE model. The model is composed of several behavior sets and behavior layers. Both of them are implemented by following the subsumption model. The behavior sets correspond to some high-level task-achieving functions. The module named 'motivational behavior' can activate the behavior sets to select a task adaptively. The 'F' circles in the figure above connect the output of each motivational behavior with the output of its corresponding behavior set indicating that a motivational behavior either allows all or none of the outputs of its behavior set to pass through to the robot's actuators. The lower several layers of the ALLIANCE architecture composed a subsumption model, we can also use the subsumption method to coordinate the behavior inside the behavior sets. Note that the motivational behavior needs to receive the sensor information. Besides, the output of some behavior set can also be used as the sensor information, which is called `virtual sensors' in ALLIANCE model(imaginary lines in the figure above). 
 
-##General Overview
+## General Overview
 <center>
 ![image2](doc/images/general_overview.jpg)
 </center>
@@ -23,13 +23,13 @@ At the bottom layer, we encapsulate the ROS communication and python multi-proce
 Finally, Behavior Layers and Behavior Sets can aggregate the Robots. 
 
 
-##UML Graph
+## UML Graph
 The UML graph shows the overall software architecture of the package.
 <center>
 ![image3](doc/images/alliance_generic_uml.jpg)
 </center>
 
-##Main APIs
+## Main APIs
 The main APIs are shown below. The parameter names present the parameter function clearly. As mentioned above, each motivational behavior is responsible for activating a forwarder to forward the messges sent from the attached behavior set. So the 'MotivationalBehavior' class should have a parameter named 'forwarder_name' indicating that which forwarder it activates. The paramters of the topics in 'Forwarder' indicate which behavior set they attach.
 
 ```python
@@ -39,7 +39,7 @@ Forwarder(forwarder_name, topic_1_in , msg_1_type, topic_1_out, topic_2_in, msg_
 MotivationalBehavior(motivational_behavior_name, robot_ID, behavior_set_ID, forwarder_name)
 ```
 
-##A Demo
+## A Demo
 We assume a scenario that there are three rooms in a house and each robot patrols a room according to several pre-selected goals. If another intruder robot moves into the house, one of the three patrol robots can detect it, follow it and alarm. But at the same time, the room the robot patrols before is empty. So the other two patrol robots will compensate for this fault and patrol different rooms alternately. Besides, during the whole system running, one of the robot may break down, the other two robots may also compensate the fault according to the way mentioned above. We have used the package to develop the system. 
 
 * The ALLIANCE model and UML graph of the application is shown in the figures below
@@ -109,5 +109,5 @@ roslaunch micros_mars_task_alloc robot3_control.launch
 ```
 One of the robot can detect and follow it immediately. The remained room will not be empty, because the other two robots will patrol the three rooms alternatively and compensate for this fault.
 
-##Videos
+## Videos
 The experimental videos can be downloaded and watched [here.](https://www.trustie.net/organizations/61)
